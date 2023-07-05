@@ -2,13 +2,11 @@
 <html>
 
 <body>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 offset-lg-2">
-        <h3 class="mt-5">PresentAI demo</h3>
-        <img src="{{ url_for('video_feed') }}" width="80%" />
-      </div>
-  </div>
+  <h1>Upload PPTX File</h1>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="pptx_file" accept=".pptx">
+        <input type="submit" value="Upload">
+    </form>
 </body>
 
 </html>

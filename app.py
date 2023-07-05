@@ -1,9 +1,28 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response ,request
 from cvzone.HandTrackingModule import HandDetector
 import cv2
 import os
 import numpy as np
+import comtypes.client
+from pdf2image import convert_from_path
+from pdf2image.exceptions import (
+    PDFInfoNotInstalledError,
+    PDFPageCountError,
+    PDFSyntaxError
+)
+
 app = Flask(__name__)
+
+def PPTtoPDF(inputFileName, outputFileName, formatType = 32):
+    powerpoint = comtypes.client.CreateObject("Powerpoint.Application")
+    powerpoint.Visible = 1
+
+    if outputFileName[-3:] != 'pdf':
+        outputFileName = outputFileName + ".pdf"
+        deck = powerpoint.Presentations.Open(inputFileName)
+        deck.SaveAs(outputFileName, formatType) # formatType = 32 for ppt to pdf
+        deck.Close()
+        powerpoint.Quit()
 
 def gen_frames():
     # Parameters
@@ -159,6 +178,25 @@ def video_feed():
 def slides_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frames')
 
+@app.route('/upload', methods=['POST'])
+
+def upload():
+    pptx_file = request.files['pptx_file']
+    if pptx_file:
+        # Save the uploaded file to a folder
+        if pptx_file.save('C:\\Users\\g\\Documents\\dev\\test\\ppt_file'):
+           PPTtoPDF('C:\\Users\\g\\Documents\\dev\\test\\ppt_file',"C:\\Users\\g\\Documents\\dev\\test\\name")
+        else:
+            return "ppt not saved at all"
+        
+        return 'File uploaded and saved successfully!'
+    else:
+        return 'file not uploaded succesfully'
+       
+        # Process the uploaded file here (e.g., save it to a folder, extract data, etc.)
+        # You can access the file name using pptx_file.filename
+    
+      
 
 
 if __name__ == '__main__':

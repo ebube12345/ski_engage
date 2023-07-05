@@ -1,9 +1,10 @@
+import comtypes.client
 from flask import Flask, render_template, Response ,request
 from cvzone.HandTrackingModule import HandDetector
-import cv2
 import os
+from werkzeug.utils import secure_filename
+import cv2
 import numpy as np
-import comtypes.client
 from pdf2image import convert_from_path
 from pdf2image.exceptions import (
     PDFInfoNotInstalledError,
@@ -13,7 +14,10 @@ from pdf2image.exceptions import (
 
 app = Flask(__name__)
 
+image =[]  #Array for storing images
+
 def PPTtoPDF(inputFileName, outputFileName, formatType = 32):
+    comtypes.CoInitialize() 
     powerpoint = comtypes.client.CreateObject("Powerpoint.Application")
     powerpoint.Visible = 1
 
@@ -24,12 +28,21 @@ def PPTtoPDF(inputFileName, outputFileName, formatType = 32):
         deck.Close()
         powerpoint.Quit()
 
+    # incase of Linux we don't have to provide the popper_path parameter
+    images = convert_from_path(
+        "C:\\Users\\g\\Documents\\dev\\test\\name.pdf")
+
+    for i in range(len(images)):
+        # Save pages as images in the pdf
+        images[i].save(f'image_{i+1}.png','PNG')
+        image.append(images[i])
+
+    print(image)
+
 def gen_frames():
     # Parameters
     width, height = 1920, 1080
     gestureThreshold = 300
-    #put the presentation folder path here
-    folderPath = "presentation1"
 
     # Camera Setup
     cap = cv2.VideoCapture(0)
@@ -52,16 +65,14 @@ def gen_frames():
     annotationStart = False
     hs, ws = int(120 * 1), int(213 * 1)  # width and height of small image
 
-    # Get list of presentation images
-    pathImages = sorted(os.listdir(folderPath), key=len)
-    print(pathImages)
-
 
     while True:
         success, img = cap.read()
         img = cv2.flip(img, 1)
-        pathFullImage = os.path.join(folderPath, pathImages[imgNumber])
-        imgCurrent = cv2.imread(pathFullImage)
+        imgCurrent = cv2.imread(f"image_{imgNumber + 1}.png")  # Load image from the image list
+        print('---------------------------------------------------------------------------------- presentation files')
+        print(image)
+
         # Find the hand and its landmarks
         hands, img = detectorHand.findHands(img)  # with draw
         # Draw Gesture Threshold line
@@ -98,7 +109,7 @@ def gen_frames():
                 if fingers == [0, 0, 0, 0, 0]:
                     print("Right")
                     buttonPressed = True
-                    if imgNumber < len(pathImages) - 1:
+                    if imgNumber < len(image) - 1:
                         imgNumber += 1
                         annotations = [[]]
                         annotationNumber = -1
@@ -178,25 +189,43 @@ def video_feed():
 def slides_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frames')
 
-@app.route('/upload', methods=['POST'])
 
+UPLOAD_FOLDER = 'C:\\Users\\g\\Documents\\dev\\test'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+@app.route('/upload', methods=['POST'])
 def upload():
+    if 'pptx_file' not in request.files:
+        return 'No file was uploaded.'
+
     pptx_file = request.files['pptx_file']
+    print(pptx_file)
+    if pptx_file.filename == '':
+        return 'No file was selected.'
+
     if pptx_file:
-        # Save the uploaded file to a folder
-        if pptx_file.save('C:\\Users\\g\\Documents\\dev\\test\\ppt_file'):
-           PPTtoPDF('C:\\Users\\g\\Documents\\dev\\test\\ppt_file',"C:\\Users\\g\\Documents\\dev\\test\\name")
-        else:
-            return "ppt not saved at all"
+        filename = secure_filename(pptx_file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        PPTtoPDF(file_path,'C:\\Users\\g\\Documents\\dev\\test\\name')
+
+                
+        image =[]  #Array for storing images
+
+        # incase of Linux we don't have to provide the popper_path parameter
+        images = convert_from_path(
+            "C:\\Users\\g\\Documents\\dev\\test\\name.pdf")
+
+        for i in range(len(images)):
+            # Save pages as images in the pdf
+            images[i].save(f'image_{i+1}.png','PNG')
+            image.append(images[i])
+
+        print(image)
         
         return 'File uploaded and saved successfully!'
     else:
-        return 'file not uploaded succesfully'
-       
-        # Process the uploaded file here (e.g., save it to a folder, extract data, etc.)
-        # You can access the file name using pptx_file.filename
-    
-      
+        return 'An error occurred while saving the file.'
+
 
 
 if __name__ == '__main__':

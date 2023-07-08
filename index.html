@@ -32,10 +32,16 @@
 </head>
 <body>
   <h1>Upload PPTX File</h1>
+    <video id="video" width="640" height="480" autoplay></video> <!-- Added video element -->
+
     <form action="/upload" method="POST" enctype="multipart/form-data">
         <input type="file" name="pptx_file" accept=".pptx">
         <input type="submit" value="Upload">
     </form>
-</body>
 
+    
+    <!-- Include JavaScript code to capture the video feed -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
 </html>

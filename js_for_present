@@ -9,6 +9,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+var i = 0;
 const demosSection = document.getElementById("demos");
 let gestureRecognizer;
 let runningMode = "IMAGE";
@@ -167,25 +168,37 @@ async function predictWebcam() {
             drawLandmarks(canvasCtx, landmarks, { color: "#FF0000", lineWidth: 2 });
         }
     }
+    
     canvasCtx.restore();
+    setTimeout(swipe, 20000);
+    function swipe(){
     if (results.gestures.length > 0) {
         gestureOutput.style.display = "block";
         gestureOutput.style.width = videoWidth;
         const categoryName = results.gestures[0][0].categoryName;
         const categoryScore = parseFloat(results.gestures[0][0].score * 100).toFixed(2);
         gestureOutput.innerText = `GestureRecognizer: ${categoryName}\n Confidence: ${categoryScore} %`;
-
+        
         if(categoryName == "Pointing_Up"){
             console.log(" Swiping document right");
+            i +=1;
+            if (i >=13){i=0};
+            let v = i.toString();
+            console.log("image_" + v);
+            
+            document.getElementById("img").src = "/static/image_" + v +".png";
         }
         
         if(categoryName == "Closed_Fist"){
             console.log(" Swiping document left");
+            i -=1;
+            if (i <=1){i=1};
         }
     }
     else {
         gestureOutput.style.display = "none";
     }
+}
     // Call this function again to keep predicting when the browser is ready.
     if (webcamRunning === true) {
         window.requestAnimationFrame(predictWebcam);

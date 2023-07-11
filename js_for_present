@@ -189,7 +189,7 @@ async function predictWebcam() {
                 i=0;
                 console.log(" Swiping document right");
                 v+=1;
-                if(v>=10){
+                if(v>=11){
                     v=1;
                 }
                  let y = v.toString();

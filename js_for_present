@@ -10,6 +10,8 @@
 // limitations under the License.
 import { GestureRecognizer, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 var i = 0;
+var v = 0;
+var j =0;
 const demosSection = document.getElementById("demos");
 let gestureRecognizer;
 let runningMode = "IMAGE";
@@ -170,8 +172,7 @@ async function predictWebcam() {
     }
     
     canvasCtx.restore();
-    setTimeout(swipe, 20000);
-    function swipe(){
+
     if (results.gestures.length > 0) {
         gestureOutput.style.display = "block";
         gestureOutput.style.width = videoWidth;
@@ -180,25 +181,45 @@ async function predictWebcam() {
         gestureOutput.innerText = `GestureRecognizer: ${categoryName}\n Confidence: ${categoryScore} %`;
         
         if(categoryName == "Pointing_Up"){
-            console.log(" Swiping document right");
-            i +=1;
-            if (i >=13){i=0};
-            let v = i.toString();
-            console.log("image_" + v);
             
-            document.getElementById("img").src = "/static/image_" + v +".png";
+            i +=1;
+            console.log(i);
+
+            if (i ==50){
+                i=0;
+                console.log(" Swiping document right");
+                v+=1;
+                if(v>=10){
+                    v=1;
+                }
+                 let y = v.toString();
+                console.log("image_" + y);
+                document.getElementById("img").src = "/static/image_" + y +".png";
+            }
+          
         }
         
         if(categoryName == "Closed_Fist"){
+            j+=1;
+            console.log(j);
+            if (j ==50){
+             j=0;
             console.log(" Swiping document left");
-            i -=1;
-            if (i <=1){i=1};
+            v-=1;
+            if(v<=1){
+                v=1;
+            }
+            let y = v.toString();
+            console.log("image_" + y);
+            document.getElementById("img").src = "/static/image_" + y +".png";
+            }
+
         }
     }
     else {
         gestureOutput.style.display = "none";
     }
-}
+
     // Call this function again to keep predicting when the browser is ready.
     if (webcamRunning === true) {
         window.requestAnimationFrame(predictWebcam);

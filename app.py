@@ -78,6 +78,16 @@ def process_frame():
 def slides_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frames')
 
+@app.route('/delete_slide', methods=['POST'])
+def delete_slide():
+    slide_id = request.json.get('slide_id')
+    slide_folder = os.path.join(app.config['UPLOAD_FOLDER'], slide_id)
+    if os.path.exists(slide_folder):
+        # Use the os module to remove the slide folder recursively
+        shutil.rmtree(slide_folder)
+        return f"Slide with ID {slide_id} has been deleted."
+    else:
+        return f"Slide with ID {slide_id} does not exist."
 
 @app.route('/upload', methods=['POST'])
 def upload():

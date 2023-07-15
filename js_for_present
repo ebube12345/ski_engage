@@ -225,3 +225,29 @@ async function predictWebcam() {
         window.requestAnimationFrame(predictWebcam);
     }
 }
+// Select the delete button
+const deleteButton = document.getElementById("delete-button");
+
+// Add an event listener to the delete button
+deleteButton.addEventListener("click", handleDeleteSlides);
+
+// Function to handle the delete slides action
+function handleDeleteSlides() {
+  // Send a POST request to the server to delete all slides
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/delete_slides", true);
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      if (xhr.status === 200) {
+        // If the request is successful, remove all slide containers from the DOM
+        const slideContainers = document.getElementsByClassName("slide-container");
+        Array.from(slideContainers).forEach((container) => {
+          container.remove();
+        });
+      } else {
+        console.error("Error deleting slides:", xhr.responseText);
+      }
+    }
+  };
+  xhr.send();
+}

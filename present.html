@@ -16,32 +16,38 @@ limitations under the License. -->
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 <script type="module" src="static/script.js"></script>
-<h1>PresentAI</h1>
+<h1>Recognize hand gestures using the MediaPipe HandGestureRecognizer task</h1>
 
-<section id="demos" class="invisible">
-  <P>Change slides by pointing up or closed fist to move back</P>
-  <h1><em>Wema Bank Hackathon</em>Pitch Deck presentation.</h1>
+<form action="/delete" method="POST">
+  <button type="submit">Delete Slides</button>
+</form>
 
-  <img src="static/image_1.png" width="1280" height="720" id="img">
+<body>
+  <section id="demos" class="invisible">
+    <h2>Demo: Recognize gestures</h2>
+    <p><em>Click on an image below</em> to identify the gestures in the image.</p>
+    <img src="static/image_1.png" width="1080" height="600" id="img">
+    <p id="slide_count">{{size}}</p>
 
-  <div class="detectOnClick">
-  <p>Present with ease and cofidence. </br>Click <b>enable webcam</b> below and grant access to the webcam if prompted.</p>
+    <div class="detectOnClick">
+    
 
-  <div id="liveView" class="videoView">
-    <button id="webcamButton" class="mdc-button mdc-button--raised">
-      <span class="mdc-button__ripple"></span>
-      <span class="mdc-button__label">start</span>
-    </button>
-    <div style="position: relative;">
-      <video id="webcam" autoplay playsinline></video>
-      <canvas class="output_canvas" id="output_canvas" width="1280" height="720" style="position: absolute; left: 0px; top: 0px;"></canvas>
-      <p id='gesture_output' class="output">
+    <h2><br>Demo: Webcam continuous hand gesture detection</h2>
+    <p>Use your hand to make gestures in front of the camera to get gesture classification. </br>Click <b>enable webcam</b> below and grant access to the webcam if prompted.</p>
+
+    <div id="liveView" class="videoView">
+      <button id="webcamButton" class="mdc-button mdc-button--raised">
+        <span class="mdc-button__ripple"></span>
+        <span class="mdc-button__label">ENABLE WEBCAM</span>
+      </button>
+      <div style="position: relative;">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas class="output_canvas" id="output_canvas" width="1280" height="720" style="position: absolute; left: 0px; top: 0px;"></canvas>
+        <p id='gesture_output' class="output">
+      </div>
     </div>
-    <div class="slide-container">
-      <button class="delete-slide-button" data-slide-id="delete_slide">Delete Slide</button>
-    </div>
-  </div>
-</section>
-<script>
-  
-</script>
+  </section>
+
+</body>
+
+

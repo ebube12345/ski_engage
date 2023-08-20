@@ -1,9 +1,11 @@
-from flask import Flask, render_template, Response ,request
+from flask import Flask, render_template, Response ,request, jsonify
 import os
 import shutil
 from werkzeug.utils import secure_filename
 import comtypes.client
 from pdf2image import convert_from_path
+import flask_cors
+from flask_cors import CORS, cross_origin
 
 UPLOAD_FOLDER = "C:\\Users\\Al-ghazali\\PycharmProjects\\ppt_to_pdf"
 
@@ -14,6 +16,8 @@ from pdf2image.exceptions import (
 )
 
 app = Flask(__name__)
+# CORS(app)
+flask_cors.CORS(app, expose_headers='Authorization')
 
 def PPTtoPDF(inputFileName, outputFileName, formatType = 32):
     comtypes.CoInitialize()
@@ -30,19 +34,22 @@ def PPTtoPDF(inputFileName, outputFileName, formatType = 32):
 
    
 
-@app.route('/')
+@app.route('/api', methods=['POST'])
 def index():
-    return render_template('index.html')
+    # return render_template('landing_page.html')
+    data = {'message':'Communication successful'}
+    return (data)
 
 
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'pptx_file' not in request.files:
+    if 'file' not in request.files:
+        print("No file was uploaded")
         return 'No file was uploaded.'
 
-    pptx_file = request.files['pptx_file']
+    pptx_file = request.files['file']
     print(pptx_file)
     if pptx_file.filename == '':
         return 'No file was selected.'
@@ -51,6 +58,7 @@ def upload():
         print(pptx_file)
         filename = secure_filename(pptx_file.filename)
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        pptx_file.save(file_path)
         PPTtoPDF(file_path,'C:\\Users\\Al-ghazali\\presentAi_demo\\static\\name')
         
         image =[]  #Array for storing images
@@ -115,3 +123,4 @@ def delete():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    

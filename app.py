@@ -45,11 +45,11 @@ def index():
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route('/upload', methods=['POST'])
 def upload():
-    if 'file' not in request.files:
+    if 'files' not in request.files:
         print("No file was uploaded")
         return 'No file was uploaded.'
 
-    pptx_file = request.files['file']
+    pptx_file = request.files['files']
     print(pptx_file)
     if pptx_file.filename == '':
         return 'No file was selected.'
